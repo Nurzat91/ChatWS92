@@ -27,7 +27,6 @@ export interface MessageType {
   type: string;
   text: string;
   author: string;
-  to?: string;
 }
 
 export interface IncomingMessage {

@@ -1,36 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, CircularProgress, Grid, List, ListItem, ListItemIcon, TextField, Typography } from '@mui/material';
+import {
+  Button, Card, CardContent,
+  CircularProgress,
+  Grid,
+  List,
+  ListItem,
+  ListItemIcon,
+  TextField,
+  Typography
+} from '@mui/material';
 import { useAppSelector } from '../../app/hooks';
 import { selectUser } from '../users/usersSlice';
 import { Navigate } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { IncomingMessage, Message } from '../../types';
 
 
 const PageChat = () => {
   const ws = useRef<WebSocket | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [state, setState] = useState<{ text: string }>({
-    text: '',
-  });
+  const [state, setState] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
   const user = useAppSelector(selectUser);
 
   useEffect(() => {
     setIsLoading(false);
     const connect = () => {
-      // setTimeout(() => {
-      //   ws.current = new WebSocket('ws://localhost:8000/chat');
-      //   ws.current.addEventListener('close', () => {
-      //     console.log('WebSocket closed.');
-      //     connect();
-      //   });
-      // }, 5000);
-    };
+      setTimeout(() => {
+        ws.current = new WebSocket('ws://localhost:8000/chat');
+        ws.current.addEventListener('close', () => {
+          console.log('WebSocket closed.');
+          connect();
+        });
+      }, 5000);
 
-    ws.current = new WebSocket('ws://localhost:8000/chat');
-    ws.current.addEventListener('close', () => {
-      console.log('WebSocket closed.');
-      connect();
-    });
+    };
 
     connect();
     return () => {
@@ -40,13 +44,24 @@ const PageChat = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (ws.current) {
+      ws.current.addEventListener('message', (event) => {
+        const decodedMessage = JSON.parse(event.data) as IncomingMessage;
+        if(decodedMessage.type === 'NEW_MESSAGE'){
+          setMessages(prev => [...prev, decodedMessage.payload]);
+        }
+      });
+    }
+  }, [ws.current]);
+
   if (!user) {
     return <Navigate to="/register" />;
   }
 
   const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = event.target;
-    setState((prevState) => ({...prevState, [name]: value}));
+    const value = event.target.value;
+    setState(value);
   };
 
   const sendMessage = (e: React.FormEvent) =>{
@@ -54,9 +69,10 @@ const PageChat = () => {
     console.log(state);
     if(!ws.current) return
 
-    ws.current.send(JSON.stringify({type: 'SEND_MESSAGE', payload: state.text}));
-    setState({text: ''});
+    ws.current.send(JSON.stringify({type: 'SEND_MESSAGE', payload: state}));
+    setState("");
   };
+
 
   return (
     <>
@@ -78,6 +94,17 @@ const PageChat = () => {
           <Grid item xs={9} sx={{p: 2}} height="700px">
             <Grid height="600px" sx={{overflowY: 'scroll', overflowWrap: 'break-word'}}>
               <Typography variant="h5">Chat room</Typography>
+              {messages.length > 0 && (
+                <Card>
+                  <CardContent>
+                    {messages.map((message, idx) => (
+                      <div key={idx}>
+                        <b>{message.author?.displayName}: </b> {message.text}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </Grid>
             <form autoComplete="off" onSubmit={sendMessage}>
               <Grid container direction="row">
@@ -86,7 +113,7 @@ const PageChat = () => {
                     sx={{ width: '90%'}}
                     label="Message"
                     name="text"
-                    value={state.text}
+                    value={state}
                     onChange={inputChangeHandler}
                     required
                   />

@@ -42,3 +42,8 @@ export interface Message {
   author: User;
   text: string;
 }
+
+export interface IncomingMessage {
+  type: 'NEW_MESSAGE';
+  payload: Message;
+}

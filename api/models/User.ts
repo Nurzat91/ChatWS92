@@ -47,7 +47,7 @@ const UserSchema = new Schema<UserFields, UserModel, UserMethods>({
   status: {
     type: Boolean,
     required: true,
-    default: true,
+    default: false,
   }
 });
 
