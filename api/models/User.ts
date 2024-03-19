@@ -37,17 +37,17 @@ const UserSchema = new Schema<UserFields, UserModel, UserMethods>({
   role: {
     type: String,
     required: true,
-    enum: ['client', 'admin'],
+    enum: ['client', 'moderator'],
     default: 'client',
   },
   displayName: {
     type: String,
     required: true,
   },
-  online: {
+  status: {
     type: Boolean,
     required: true,
-    default: false
+    default: true,
   }
 });
 

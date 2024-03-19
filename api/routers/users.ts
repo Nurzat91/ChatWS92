@@ -10,6 +10,7 @@ userRouter.post('/', async (req, res, next) =>{
       username: req.body.username,
       displayName: req.body.displayName,
       password: req.body.password,
+      status: req.body.status,
     });
 
     user.generateToken();

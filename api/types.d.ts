@@ -7,7 +7,7 @@ export interface UserFields {
   token: string;
   role: string;
   displayName: string;
-  online: boolean;
+  status: boolean;
 }
 
 interface UserMethods{

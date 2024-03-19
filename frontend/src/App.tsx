@@ -1,4 +1,4 @@
-import { Container, CssBaseline } from '@mui/material';
+import {CssBaseline } from '@mui/material';
 import AppToolbar from './components/UI/AppToolbar';
 import { Route, Routes } from 'react-router-dom';
 import Register from './features/users/Register';
@@ -16,14 +16,12 @@ function App() {
         <AppToolbar/>
       </header>
       <main>
-        <Container maxWidth="xl">
-          <Routes>
-            <Route path="/" element={<PageChat />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<ErrorPage/>} />
-          </Routes>
-        </Container>
+        <Routes>
+          <Route path="/" element={<PageChat />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<ErrorPage/>} />
+        </Routes>
       </main>
     </>
   );

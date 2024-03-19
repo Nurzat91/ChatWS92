@@ -14,6 +14,7 @@ export interface User {
   token: string;
   role: string;
   displayName: string;
+  status: boolean;
 }
 
 export interface ValidationError {
